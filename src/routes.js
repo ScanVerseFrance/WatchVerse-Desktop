@@ -24,7 +24,7 @@ const SITE_URL = process.env.WATCHVERSE_PUBLIC_URL || 'https://watchverse.watch'
 // Public Discord invite. ⚠️ TODO(confirm): set the real WatchVerse invite, or
 // override at runtime with WATCHVERSE_DISCORD_INVITE. An invalid invite only
 // breaks the button, not the rest of the presence.
-const DISCORD_INVITE_URL = process.env.WATCHVERSE_DISCORD_INVITE || 'https://discord.gg/watchverse';
+const DISCORD_INVITE_URL = process.env.WATCHVERSE_DISCORD_INVITE || 'https://discord.gg/EtFSEn39CE';
 
 function buildDefaultButtons() {
   return [

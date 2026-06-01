@@ -25,7 +25,7 @@ npm run dev      # localhost:5173 + DevTools
 Env vars: `WATCHVERSE_URL`, `WATCHVERSE_DEV`, `WATCHVERSE_PUBLIC_URL`
 (RPC button base, default `https://watchverse.watch`), `WATCHVERSE_API`
 (online-count base, default `https://api.watchverse.watch`),
-`WATCHVERSE_DISCORD_INVITE` (**TODO: confirm the real invite**),
+`WATCHVERSE_DISCORD_INVITE` (default `https://discord.gg/EtFSEn39CE`),
 `WATCHVERSE_DESKTOP_REPO` (updater repo, default `ScanVerseFrance/WatchVerse-Desktop`).
 
 ## Discord Rich Presence
@@ -94,8 +94,6 @@ CI (`.github/workflows/release.yml`) builds on tag push (`vX.Y.Z`) and attaches
 
 ## TODO before shipping
 
-- Confirm the real **Discord invite** (`WATCHVERSE_DISCORD_INVITE`).
-- Create the **updater repo** (`WATCHVERSE_DESKTOP_REPO`).
 - Run `npm run build:art` so the NSIS sidebar/header/icon reflect the
   WatchVerse logo (the BMP/ICO were inherited from ScanVerse).
 - The **online count** polls `${WATCHVERSE_API}/api/presence/online-count`; if

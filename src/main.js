@@ -402,7 +402,7 @@ function createWindow() {
   function buildErrorHtml(target, message) {
     const safeTarget = String(target || '').replace(/[<>&"]/g, c => ({ '<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;' }[c]));
     const safeMsg = String(message || '').replace(/[<>&"]/g, c => ({ '<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;' }[c]));
-    const invite = process.env.WATCHVERSE_DISCORD_INVITE || 'https://discord.gg/watchverse';
+    const invite = process.env.WATCHVERSE_DISCORD_INVITE || 'https://discord.gg/EtFSEn39CE';
     return `
       <html><head><meta charset="utf-8"><title>WatchVerse — Erreur</title>
       ${FONTS_HEAD}
