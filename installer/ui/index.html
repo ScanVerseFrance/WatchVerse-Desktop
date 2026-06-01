@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Installation de WatchVerse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="titlebar">
+    <div class="titlebar-brand">
+      <span class="logo-text">Watch<span class="logo-text-accent">Verse</span></span>
+      <span class="titlebar-sub">— Installation</span>
+    </div>
+    <div class="titlebar-actions">
+      <button class="tb-btn" id="tb-min" title="Réduire" aria-label="Réduire">
+        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+      <button class="tb-btn tb-close" id="tb-close" title="Fermer" aria-label="Fermer">
+        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="wizard">
+
+    <section class="page active" data-page="welcome">
+      <div class="hero">
+        <div class="hero-glow"></div>
+        <div class="hero-logo">
+          <div class="wordmark-big">Watch<span class="wordmark-big-accent">Verse</span></div>
+        </div>
+      </div>
+      <h1 class="page-title">Bienvenue sur WatchVerse</h1>
+      <p class="page-lede">
+        Le client desktop officiel pour regarder tes films, séries et animés,
+        organiser des Watch Parties et activer la présence Discord pendant que
+        tu regardes.
+      </p>
+      <ul class="features">
+        <li><span class="dot"></span> Lecteur intégré rapide, propre et sans pub</li>
+        <li><span class="dot"></span> Statut Discord automatique (film, série, épisode, Watch Party)</li>
+        <li><span class="dot"></span> Watch Party, TV en direct et synchronisation de la progression</li>
+      </ul>
+      <footer class="actions">
+        <button class="btn ghost" data-link="https://watchverse.watch">Voir le site</button>
+        <button class="btn primary" data-next>Suivant</button>
+      </footer>
+    </section>
+
+    <section class="page" data-page="license">
+      <h1 class="page-title">Conditions d'utilisation</h1>
+      <p class="page-lede">Lis et accepte avant d'installer WatchVerse.</p>
+      <div class="license-box">
+        <p class="license-intro"><strong>En bref —</strong> WatchVerse est une plateforme communautaire de démonstration, à but non lucratif. WatchVerse n'héberge aucun fichier vidéo : il référence et lit des sources tierces. Les œuvres appartiennent à leurs auteurs et ayants droit. Sois respectueux, ne triche pas avec ton compte, et profite.</p>
+
+        <h3>1. Champ d'application</h3>
+        <ul>
+          <li>Ces conditions s'appliquent à l'application desktop WatchVerse et à son site <code>watchverse.watch</code>.</li>
+          <li>L'usage du service vaut acceptation des présentes conditions.</li>
+          <li>WatchVerse est édité par un développeur indépendant à des fins de démonstration et d'apprentissage.</li>
+        </ul>
+
+        <h3>2. Compte, profils et sécurité</h3>
+        <ul>
+          <li>Un compte est nécessaire pour suivre tes visionnages, gérer ta bibliothèque et utiliser les fonctions sociales (Watch Party, amis).</li>
+          <li>Tu es responsable de la confidentialité de tes identifiants. Préviens-nous en cas d'usage frauduleux.</li>
+          <li>Le pseudo, l'avatar et la bio doivent rester respectueux et non trompeurs (pas d'usurpation d'identité).</li>
+        </ul>
+
+        <h3>3. Utilisation acceptable</h3>
+        <ul>
+          <li>Pas de scraping massif, ni d'automatisation visant à contourner les limites du service.</li>
+          <li>Pas de propos haineux, harcelants, sexuellement explicites ou illégaux dans les commentaires, profils, messages ou Watch Parties.</li>
+          <li>Pas de contournement des restrictions techniques (modification du client, faux signalements, etc.).</li>
+        </ul>
+
+        <h3>4. Sources tierces — lecture et disponibilité</h3>
+        <ul>
+          <li>WatchVerse référence et indexe des œuvres ; il n'héberge aucun fichier vidéo.</li>
+          <li>La lecture dépend de sources tierces (hébergeurs) et peut changer ou cesser sans préavis.</li>
+          <li>Aucune garantie de complétude, d'exactitude ou de pérennité des contenus n'est apportée.</li>
+        </ul>
+
+        <h3>5. Watch Party et fonctionnalités communautaires</h3>
+        <ul>
+          <li>Les Watch Parties, commentaires, profils et messages peuvent être modérés ou supprimés sans préavis.</li>
+          <li>L'hôte d'une Watch Party peut exclure ou bannir un participant. Les comptes en infraction peuvent être suspendus.</li>
+          <li>Tu conserves la propriété de tes contenus mais accordes à WatchVerse une licence pour les afficher dans le service.</li>
+        </ul>
+
+        <h3>6. Présence Discord et données</h3>
+        <ul>
+          <li>L'app desktop transmet à Discord ton activité (film, série, épisode, Watch Party, TV en direct) si tu actives la Rich Presence.</li>
+          <li>Cette fonction est désactivable depuis <code>Paramètres → Confidentialité → Activité Discord</code>.</li>
+          <li>Aucune donnée personnelle n'est collectée par l'application desktop en dehors de cet usage.</li>
+        </ul>
+
+        <h3>7. Accès WatchVerse+</h3>
+        <ul>
+          <li>Certaines fonctionnalités (lecture sans pub, cosmétiques) peuvent être réservées aux abonnés WatchVerse+.</li>
+          <li>L'accès WatchVerse+ est actuellement attribué manuellement et ne donne lieu à aucun paiement réel via l'app.</li>
+          <li>Aucune transaction financière n'est traitée par l'application desktop.</li>
+        </ul>
+
+        <h3>8. Suspension, évolution et responsabilité</h3>
+        <ul>
+          <li>Le service peut évoluer, être interrompu temporairement ou définitivement sans préavis.</li>
+          <li>L'éditeur ne peut être tenu responsable des pertes de données, indisponibilités ou contenus tiers.</li>
+          <li>Pour toute demande, contacte l'équipe via le serveur Discord officiel.</li>
+        </ul>
+
+        <p class="muted small">Dernière mise à jour : juin 2026 — © 2026 WatchVerse — Tous droits réservés.</p>
+      </div>
+      <label class="check">
+        <input type="checkbox" id="agree-cb" />
+        <span class="check-box"></span>
+        <span>J'accepte les conditions d'utilisation</span>
+      </label>
+      <footer class="actions">
+        <button class="btn ghost" data-back>Précédent</button>
+        <button class="btn primary" data-next id="license-next" disabled>Suivant</button>
+      </footer>
+    </section>
+
+    <section class="page" data-page="path">
+      <h1 class="page-title">Choisis le dossier d'installation</h1>
+      <p class="page-lede">WatchVerse occupe environ 350 Mo. Tu peux changer le dossier ou laisser celui par défaut.</p>
+      <div class="path-row">
+        <input type="text" id="path-input" class="input" readonly />
+        <button class="btn ghost" id="path-pick">Parcourir…</button>
+      </div>
+      <div class="opts">
+        <label class="check">
+          <input type="checkbox" id="opt-desktop" checked />
+          <span class="check-box"></span>
+          <span>Créer un raccourci sur le Bureau</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="opt-startmenu" checked />
+          <span class="check-box"></span>
+          <span>Créer un raccourci dans le Menu Démarrer</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="opt-launch" checked />
+          <span class="check-box"></span>
+          <span>Lancer WatchVerse à la fin de l'installation</span>
+        </label>
+      </div>
+      <footer class="actions">
+        <button class="btn ghost" data-back>Précédent</button>
+        <button class="btn primary" id="install-btn">Installer</button>
+      </footer>
+    </section>
+
+    <section class="page" data-page="progress">
+      <h1 class="page-title">Installation en cours</h1>
+      <p class="page-lede" id="progress-phase">Préparation…</p>
+      <div class="progress-shell">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <p class="progress-detail" id="progress-detail">0 / 0 fichiers</p>
+      <p class="muted small">Ne ferme pas cette fenêtre, l'opération prend une dizaine de secondes.</p>
+    </section>
+
+    <section class="page" data-page="done">
+      <div class="check-circle">
+        <svg viewBox="0 0 32 32" width="48" height="48"><path d="M9 16l5 5 9-11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h1 class="page-title">Installation terminée</h1>
+      <p class="page-lede" id="done-msg">WatchVerse a été installé sur ton ordinateur. Ouvre-le pour commencer à regarder.</p>
+      <footer class="actions center">
+        <button class="btn primary" id="finish-btn">Fermer</button>
+      </footer>
+    </section>
+
+    <section class="page" data-page="error">
+      <div class="error-circle">!</div>
+      <h1 class="page-title">L'installation a échoué</h1>
+      <p class="page-lede" id="error-msg">Une erreur s'est produite.</p>
+      <footer class="actions center">
+        <button class="btn ghost" id="error-retry">Réessayer</button>
+        <button class="btn primary" id="error-close">Fermer</button>
+      </footer>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "appId": "com.watchverse.installer",
+  "productName": "WatchVerse Setup",
+  "copyright": "Copyright © 2026 Team WatchVerse",
+  "directories": {
+    "app": "installer",
+    "output": "dist"
+  },
+  "files": [
+    "**/*"
+  ],
+  "extraResources": [
+    {
+      "from": "installer/payload",
+      "to": "payload",
+      "filter": ["**/*"]
+    }
+  ],
+  "win": {
+    "target": [
+      { "target": "portable", "arch": ["x64"] }
+    ],
+    "icon": "assets/installer-icon.ico",
+    "artifactName": "WatchVerse-Setup-${version}.${ext}"
+  },
+  "portable": {
+    "artifactName": "WatchVerse-Setup-${version}.${ext}"
+  },
+  "asar": true,
+  "compression": "maximum"
+}

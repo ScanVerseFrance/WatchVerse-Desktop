@@ -1,0 +1,338 @@
+/*
+ * WatchVerse Setup — design tokens lifted from the web frontend so the
+ * installer feels like a continuation of the site, not a generic wizard.
+ */
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --surface-2: #18181f;
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.18);
+  --text: #f0f0f5;
+  --text-dim: #9090a8;
+  --text-faint: #5a5a72;
+  --accent: #e63946;
+  --accent-2: #f59e0b;
+  --accent-soft: rgba(230, 57, 70, 0.16);
+  --danger: #ef4444;
+  --success: #22c55e;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Syne', system-ui, -apple-system, Segoe UI, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.005em;
+  user-select: none;
+  overflow: hidden;
+}
+
+button { font-family: inherit; font-size: inherit; cursor: pointer; }
+
+/* ── Custom titlebar — frameless window ─────────────────────────────────── */
+.titlebar {
+  -webkit-app-region: drag;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #15151c 0%, #0e0e15 100%);
+}
+.titlebar-brand {
+  display: flex; align-items: baseline; gap: 8px;
+  font-weight: 800; letter-spacing: -0.5px; font-size: 14px;
+}
+.titlebar-sub {
+  color: var(--text-dim); font-weight: 600; font-size: 12px; letter-spacing: 0;
+}
+/* Wordmark — matches the navbar on watchverse.watch exactly:
+   "Scan" in white + "Verse" in the brand red (#e63946 via --accent).
+   The earlier gradient WV badge looked off-brand because the actual
+   logo on the site is type-only. Switched from violet (#a855f7) on
+   2026-05-16 to match the refreshed WatchVerse logo (red V).                       */
+.logo-text-accent { color: var(--accent); }
+
+/* Big wordmark used on the welcome hero — same logic, just scaled up
+   with a tighter tracking so it reads as a real headline. */
+.wordmark-big {
+  font-size: 56px;
+  font-weight: 800;
+  letter-spacing: -1.6px;
+  line-height: 1;
+  color: var(--text);
+  text-shadow: 0 0 28px rgba(230,57,70,0.45);
+}
+.wordmark-big-accent { color: var(--accent); }
+.titlebar-actions { display: flex; gap: 2px; -webkit-app-region: no-drag; }
+.tb-btn {
+  width: 36px; height: 28px;
+  background: transparent; border: none; color: var(--text-dim);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px;
+  transition: background 0.12s, color 0.12s;
+}
+.tb-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+.tb-close:hover { background: var(--danger); color: #fff; }
+
+/* ── Wizard container ──────────────────────────────────────────────────── */
+.wizard {
+  position: relative;
+  height: calc(100% - 36px);
+  overflow: hidden;
+}
+.page {
+  position: absolute; inset: 0;
+  padding: 28px 36px 24px;
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none;
+  transform: translateX(24px);
+  transition: opacity 240ms ease, transform 240ms cubic-bezier(0.22,1,0.36,1);
+}
+.page.active {
+  opacity: 1; pointer-events: auto; transform: none;
+}
+
+/* ── Hero (welcome page) ───────────────────────────────────────────────── */
+.hero {
+  position: relative; height: 130px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 8px;
+}
+.hero-glow {
+  position: absolute; inset: -40px;
+  background: radial-gradient(ellipse at center, rgba(230,57,70,0.25) 0%, transparent 70%);
+  pointer-events: none;
+  filter: blur(20px);
+}
+.hero-logo { position: relative; z-index: 1; }
+
+/* ── Typography ────────────────────────────────────────────────────────── */
+.page-title {
+  font-size: 24px; font-weight: 800; letter-spacing: -0.6px; line-height: 1.2;
+  margin-bottom: 8px;
+}
+.page-lede {
+  color: var(--text-dim); font-size: 14px; line-height: 1.55;
+  margin-bottom: 16px;
+}
+.muted { color: var(--text-dim); }
+.muted.small { font-size: 12px; }
+
+/* ── Welcome features list ─────────────────────────────────────────────── */
+.features {
+  list-style: none; display: flex; flex-direction: column; gap: 10px;
+  margin: 4px 0 8px;
+  font-size: 13px; color: var(--text);
+}
+.features li { display: flex; align-items: center; gap: 10px; }
+.dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  flex-shrink: 0;
+}
+
+/* ── License box ───────────────────────────────────────────────────────── */
+.license-box {
+  flex: 1; min-height: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  overflow-y: auto;
+  font-size: 13px; line-height: 1.6;
+  color: var(--text-dim);
+  user-select: text;
+}
+.license-box p { margin-bottom: 10px; }
+.license-box p:last-child { margin-bottom: 0; }
+.license-box ul {
+  padding-left: 18px; margin-bottom: 14px;
+}
+.license-box li { margin-bottom: 4px; }
+.license-box h3 {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 14px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.license-box h3:first-of-type { margin-top: 8px; }
+.license-intro {
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  padding: 10px 12px;
+  border-radius: 6px;
+  color: var(--text);
+  margin-bottom: 14px !important;
+}
+.license-intro strong { color: var(--accent); }
+.license-box code {
+  background: var(--surface-2); padding: 1px 6px; border-radius: 4px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px;
+  color: #fca5a5;
+}
+.license-box strong { color: var(--text); }
+.license-box::-webkit-scrollbar { width: 8px; }
+.license-box::-webkit-scrollbar-thumb {
+  background: var(--border-strong); border-radius: 4px;
+}
+
+/* ── Checkbox ─────────────────────────────────────────────────────────── */
+.check {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin: 12px 0;
+  cursor: pointer; user-select: none;
+}
+.check input { position: absolute; opacity: 0; pointer-events: none; }
+.check-box {
+  width: 18px; height: 18px; border-radius: 5px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  transition: all 0.15s;
+  flex-shrink: 0;
+  position: relative;
+}
+.check input:checked + .check-box {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(230,57,70,0.55);
+}
+.check input:checked + .check-box::after {
+  content: ''; position: absolute;
+  left: 5px; top: 2px;
+  width: 5px; height: 9px;
+  border: solid #0a0a0f;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.check:hover .check-box { border-color: var(--accent); }
+
+/* ── Path row ─────────────────────────────────────────────────────────── */
+.path-row {
+  display: flex; gap: 8px; margin: 12px 0 16px;
+}
+.input {
+  flex: 1;
+  height: 38px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 0 12px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px;
+  outline: none;
+  transition: border 0.12s;
+}
+.input:focus { border-color: var(--accent); }
+.opts {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-bottom: 8px;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+.btn {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-weight: 700; font-size: 13px;
+  border: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform 0.08s ease, background 0.15s, box-shadow 0.15s;
+}
+.btn:active { transform: scale(0.97); }
+.btn.primary {
+  background: linear-gradient(135deg, var(--accent) 0%, #b91c1c 100%);
+  color: #fff;
+  box-shadow: 0 0 18px rgba(230,57,70,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.btn.primary:hover {
+  box-shadow: 0 0 26px rgba(230,57,70,0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+}
+.btn.primary:disabled {
+  opacity: 0.45; cursor: not-allowed; box-shadow: none;
+}
+.btn.ghost {
+  background: var(--surface);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+.btn.ghost:hover {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+/* Discord button — keeps the Discord brand blurple (#5865f2) on hover
+   since that's a Discord-recognisable colour, not the WatchVerse brand.
+   Stands out among the other ghost buttons without competing with the
+   primary red CTA. */
+.btn.btn-discord {
+  color: #b8c0ff;
+  border-color: rgba(88,101,242,0.35);
+}
+.btn.btn-discord:hover {
+  background: rgba(88,101,242,0.12);
+  color: #fff;
+  border-color: rgba(88,101,242,0.7);
+}
+.btn.btn-discord svg { flex-shrink: 0; }
+
+/* ── Actions footer ───────────────────────────────────────────────────── */
+.actions {
+  margin-top: auto;
+  display: flex; gap: 10px; justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.actions.center { justify-content: center; }
+
+/* ── Progress page ────────────────────────────────────────────────────── */
+.progress-shell {
+  height: 8px;
+  background: var(--surface-2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0 8px;
+  border: 1px solid var(--border);
+}
+.progress-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+  border-radius: 4px;
+  transition: width 0.25s ease;
+  box-shadow: 0 0 12px rgba(230,57,70,0.55);
+}
+.progress-detail {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px; color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+/* ── Done / Error icons ───────────────────────────────────────────────── */
+.check-circle, .error-circle {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 24px auto 16px;
+  font-weight: 800; font-size: 32px;
+}
+.check-circle {
+  background: rgba(34,197,94,0.18);
+  color: var(--success);
+  box-shadow: 0 0 36px rgba(34,197,94,0.35);
+}
+.error-circle {
+  background: rgba(239,68,68,0.18);
+  color: var(--danger);
+  box-shadow: 0 0 36px rgba(239,68,68,0.35);
+}

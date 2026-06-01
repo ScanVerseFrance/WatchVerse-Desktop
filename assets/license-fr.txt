@@ -1,0 +1,23 @@
+CONDITIONS D'UTILISATION — WATCHVERSE
+
+WatchVerse est une plateforme de démonstration à but non commercial.
+WatchVerse n'héberge aucun fichier vidéo : l'application référence et
+lit des sources tierces. Les œuvres présentées appartiennent à leurs
+auteurs et ayants droit respectifs. Aucune transaction financière
+réelle n'est effectuée par l'application desktop.
+
+En installant cette application, vous acceptez :
+
+  • L'usage strictement personnel et privé du logiciel.
+  • L'utilisation de Discord Rich Presence (désactivable à tout moment
+    depuis Paramètres → Confidentialité → Activité Discord).
+  • La connexion sortante vers https://watchverse.watch pour charger
+    l'interface, et vers Discord pour le statut.
+
+Aucune donnée personnelle n'est collectée par l'application desktop
+en dehors de votre identifiant Discord (lorsque la fonctionnalité
+Rich Presence est activée).
+
+Pour toute question : contact@watchverse.watch
+
+© 2026 WatchVerse — Tous droits réservés.

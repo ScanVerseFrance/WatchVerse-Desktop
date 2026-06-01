@@ -1,0 +1,63 @@
+# Triggered when we push a tag like `v0.2.0`. Builds the custom WatchVerse
+# installer on a fresh Windows runner and attaches the .exe to a GitHub
+# Release tied to that tag. Existing installs detect the new release on
+# their next launch via src/update-check.js and prompt the user to grab it.
+#
+# To cut a release:
+#   1. Bump version in package.json AND installer/package.json (must match).
+#   2. git commit + git tag v<version> + git push --tags
+#   3. Wait ~5 min for this workflow to finish.
+#   4. Edit the auto-generated release notes on github.com if you want to
+#      add a human-readable changelog (the file is uploaded automatically).
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+# softprops/action-gh-release needs `contents: write` to create the release
+# and upload the .exe asset.
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build installer
+        # Two-stage build: main app --dir → copy into installer/payload →
+        # build installer .exe. Output: dist/WatchVerse-Setup-X.Y.Z.exe.
+        # Skip code-signing on CI since we don't have a cert (yet).
+        run: npm run build:setup
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Show artifacts
+        # Sanity-check what made it into dist/ before we try to upload it.
+        run: |
+          dir dist
+        shell: cmd
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # Auto-generated changelog from commit messages between this tag
+          # and the previous one. Editable on github.com afterward.
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            dist/WatchVerse-Setup-*.exe
