@@ -16,11 +16,16 @@
  *     film/série/animé, the live TV, and the Watch Party.
  */
 
-// Large-image asset key uploaded to the WatchVerse Discord Dev Portal
-// (Rich Presence → Art Assets). The user uploaded the logo under `big_image`.
-const FALLBACK_LARGE_KEY = 'big_image';
 // Prefix for relative image URLs + base for RPC button links.
 const SITE_URL = process.env.WATCHVERSE_PUBLIC_URL || 'https://watchverse.watch';
+// Grande image Discord par défaut (idle / navigation / dans une vox). AVANT :
+// la clé d'asset 'big_image' du Dev Portal — si l'asset n'est pas uploadé (ou
+// porte un autre nom), Discord affiche un "?" à la place du logo (bug user :
+// pas de logo WatchVerse quand on est dans une vox). Discord PROXIE une URL
+// https passée en largeImageKey (exactement comme les covers TMDB qui marchent
+// déjà), donc on pointe directement sur le logo public 512×512 → zéro
+// dépendance au Dev Portal, plus jamais de "?".
+const FALLBACK_LARGE_KEY = SITE_URL.replace(/\/$/, '') + '/icon-512.png';
 // Public Discord invite. ⚠️ TODO(confirm): set the real WatchVerse invite, or
 // override at runtime with WATCHVERSE_DISCORD_INVITE. An invalid invite only
 // breaks the button, not the rest of the presence.
