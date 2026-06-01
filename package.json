@@ -1,6 +1,6 @@
 {
   "name": "watchverse-webview",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Native desktop wrapper for WatchVerse with Discord Rich Presence",
   "main": "src/main.js",
   "private": true,
@@ -45,8 +45,18 @@
     ],
     "win": {
       "target": [
-        { "target": "nsis", "arch": ["x64"] },
-        { "target": "portable", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "icon": "assets/icon.png",
       "artifactName": "WatchVerse-${version}-${arch}.${ext}"

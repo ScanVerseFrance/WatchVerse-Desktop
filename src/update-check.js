@@ -39,9 +39,10 @@ const fs = require('fs');
 const os = require('os');
 const { spawn } = require('child_process');
 
-// TODO(confirm): create this repo (or point at your real one). Until a
-// release with a Setup .exe exists, the update check is a graceful no-op.
-const REPO = process.env.WATCHVERSE_DESKTOP_REPO || 'WatchVerseFrance/WatchVerse-Desktop';
+// Dépôt des releases desktop. ⚠️ CORRIGÉ 2026-06-02 : pointait sur
+// 'WatchVerseFrance/...' (org inexistante) → l'API 404ait → l'app ne trouvait
+// JAMAIS de mise à jour. Le vrai dépôt est ScanVerseFrance/WatchVerse-Desktop.
+const REPO = process.env.WATCHVERSE_DESKTOP_REPO || 'ScanVerseFrance/WatchVerse-Desktop';
 const RELEASES_API = `https://api.github.com/repos/${REPO}/releases/latest`;
 const RELEASES_PAGE = `https://github.com/${REPO}/releases/latest`;
 
@@ -63,6 +64,21 @@ function isNewer(latest, current) {
   if (la !== ca) return la > ca;
   if (lb !== cb) return lb > cb;
   return lc > cc;
+}
+
+// Nettoie les installeurs téléchargés lors de mises à jour précédentes. Après
+// un update, l'app se ferme (app.quit) AVANT de pouvoir effacer le .exe du
+// %TEMP% → il y restait. On le supprime au prochain lancement (user 2026-06-02
+// "quand on a fini d'installer, l'installateur est effacé ?" — désormais oui).
+function cleanupOldInstallers() {
+  try {
+    const dir = os.tmpdir();
+    for (const f of fs.readdirSync(dir)) {
+      if (/^WatchVerse-Setup-.*\.exe$/i.test(f)) {
+        try { fs.unlinkSync(path.join(dir, f)); } catch { /* verrouillé → retry au prochain lancement */ }
+      }
+    }
+  } catch { /* tmpdir illisible — ignore */ }
 }
 
 async function fetchLatestRelease() {
@@ -242,6 +258,7 @@ function registerIpc() {
  */
 async function checkForUpdates(parent) {
   registerIpc();
+  cleanupOldInstallers(); // efface l'installeur d'un update précédent
 
   const release = await fetchLatestRelease();
   if (!release || !release.tag_name) {
