@@ -187,6 +187,32 @@ async function runSilentInstall() {
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+// Force-kill toute instance de WatchVerse.exe (PAS l'installeur, qui s'appelle
+// "WatchVerse Setup"/"WatchVerse-Setup-x.y.z"). Indispensable AVANT d'écraser
+// une install existante : un .exe/.dll en cours d'exécution est verrouillé, et
+// rm/copyFile échoue dessus → l'install entière avortait quand l'ancienne 0.1.0
+// tournait encore (bug user 2026-06-02 « ça ne remplace pas les fichiers »).
+function killRunningApp() {
+  return new Promise((resolve) => {
+    if (process.platform !== 'win32') return resolve();
+    execFile('taskkill', ['/IM', 'WatchVerse.exe', '/F', '/T'],
+      { windowsHide: true }, () => setTimeout(resolve, 700));
+  });
+}
+
+// copyFile résilient : retry sur EBUSY/EPERM (fichier brièvement verrouillé,
+// p.ex. juste après le taskkill). Sans ça, un seul fichier encore tenu faisait
+// échouer toute la copie.
+async function copyFileRetry(src, dst) {
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try { await ofsp.copyFile(src, dst); return; }
+    catch (err) {
+      if (attempt === 3) throw err;
+      await sleep(350);
+    }
+  }
+}
+
 // ── IPC ──────────────────────────────────────────────────────────────────────
 // Renderer asks for default path / picks a folder / kicks off install.
 
@@ -220,6 +246,13 @@ ipcMain.handle('installer:install', async (_event, opts = {}) => {
   }
 
   try {
+    // 0. Tuer toute instance en cours AVANT d'écraser : sinon les binaires
+    //    verrouillés (app 0.1.0 ouverte) font échouer rm/copyFile et l'install
+    //    n'écrase rien (bug user 2026-06-02). Le chemin silent le faisait déjà ;
+    //    le chemin UI (install manuelle par-dessus) ne le faisait pas.
+    win.webContents.send('installer:progress', { phase: 'copy', cur: 0, total: 1 });
+    await killRunningApp();
+
     // 1. Copy the payload into the install path.
     await ensureCleanDir(installPath);
     await copyDir(payload, installPath, (cur, total) => {
@@ -281,11 +314,18 @@ async function ensureCleanDir(dir) {
   await ofsp.mkdir(dir, { recursive: true });
   // If the dir already has files (re-install over previous version), wipe
   // them — safer than merging since old versions may have stale files.
-  // Use ofs in case the install dir somehow contains an asar (unlikely but
-  // belt-and-suspenders).
-  const existing = await ofsp.readdir(dir);
+  // BEST-EFFORT : un fichier encore verrouillé NE DOIT PAS faire échouer toute
+  // l'install (copyDir réécrit par-dessus de toute façon). On retente quelques
+  // fois pour les fichiers tout juste libérés par killRunningApp, puis on
+  // continue quoi qu'il arrive. (Avant : un seul rm en échec avortait tout →
+  // « ça ne remplace pas la 0.1.0 ».)
+  let existing = [];
+  try { existing = await ofsp.readdir(dir); } catch { return; }
   for (const name of existing) {
-    await ofsp.rm(path.join(dir, name), { recursive: true, force: true });
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try { await ofsp.rm(path.join(dir, name), { recursive: true, force: true }); break; }
+      catch { await sleep(300); }
+    }
   }
 }
 
@@ -317,7 +357,7 @@ async function copyDir(src, dst, onProgress) {
       if (e.isDirectory()) {
         await walk(sFull, dFull);
       } else {
-        await ofsp.copyFile(sFull, dFull);
+        await copyFileRetry(sFull, dFull);
         cur++;
         if (onProgress && (cur % 8 === 0 || cur === total)) onProgress(cur, total);
       }
@@ -327,36 +367,71 @@ async function copyDir(src, dst, onProgress) {
 }
 
 async function writeUninstaller(installPath) {
-  // Minimal .cmd uninstaller — kills the running app then removes the
-  // install dir + registry key + shortcuts. Not pretty but reliable.
-  const cmd = `@echo off
-chcp 65001 > nul
-echo Désinstallation de WatchVerse en cours...
-taskkill /IM WatchVerse.exe /F > nul 2>&1
-timeout /t 1 /nobreak > nul
-reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\WatchVerse" /f > nul 2>&1
-del "%APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\WatchVerse.lnk" > nul 2>&1
-del "%USERPROFILE%\\Desktop\\WatchVerse.lnk" > nul 2>&1
-cd /d "%TEMP%"
-rmdir /s /q "${installPath}" > nul 2>&1
-echo WatchVerse a été désinstallé.
-timeout /t 2 /nobreak > nul
-exit
+  // Désinstallateur PowerShell — SILENCIEUX (aucune fenêtre) et FIABLE.
+  //
+  // Pourquoi PowerShell et plus le .cmd : l'ancien Uninstall.cmd vivait DANS le
+  // dossier qu'il devait supprimer. Un .cmd en cours d'exécution garde son
+  // propre fichier ouvert (cmd lit ligne par ligne) → `rmdir /s /q <dir>` ne
+  // pouvait pas effacer le dossier (fichier verrouillé) → fenêtre CMD visible +
+  // dossier résiduel (bug user 2026-06-02 « ça ouvre juste un CMD, ça bug »).
+  //
+  // PowerShell parse TOUT le script en mémoire au lancement (il ne garde pas le
+  // .ps1 ouvert pendant l'exécution) ET on se recopie d'abord dans %TEMP% puis
+  // on relance caché : la copie temp peut donc effacer la TOTALITÉ du dossier
+  // d'install, y compris le Uninstall.ps1 d'origine. Zéro résidu, zéro fenêtre.
+  const regKey = 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\WatchVerse';
+  const ps = `# WatchVerse - desinstallateur silencieux (genere par l'installeur).
+param([switch]$Relocated)
+$ErrorActionPreference = 'SilentlyContinue'
+$installPath = '${installPath.replace(/'/g, "''")}'
+
+if (-not $Relocated) {
+  # Se recopier dans %TEMP% et relancer cache, pour pouvoir supprimer le dossier
+  # d'install en entier (script d'origine inclus).
+  $tmp = Join-Path $env:TEMP 'WatchVerse-Uninstall.ps1'
+  Copy-Item -LiteralPath $PSCommandPath -Destination $tmp -Force
+  Start-Process powershell -WindowStyle Hidden -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File',('"' + $tmp + '"'),'-Relocated'
+  return
+}
+
+Start-Sleep -Milliseconds 600
+Stop-Process -Name 'WatchVerse' -Force
+Start-Sleep -Seconds 1
+reg delete '${regKey}' /f | Out-Null
+Remove-Item -LiteralPath (Join-Path $env:APPDATA 'Microsoft\\Windows\\Start Menu\\Programs\\WatchVerse.lnk') -Force
+Remove-Item -LiteralPath (Join-Path $env:USERPROFILE 'Desktop\\WatchVerse.lnk') -Force
+# Suppression du dossier avec retries (un AV/indexeur peut tenir un fichier une
+# fraction de seconde apres le kill).
+for ($i = 0; $i -lt 6; $i++) {
+  Remove-Item -LiteralPath $installPath -Recurse -Force
+  if (-not (Test-Path -LiteralPath $installPath)) { break }
+  Start-Sleep -Milliseconds 500
+}
+# Auto-suppression de la copie temporaire.
+Remove-Item -LiteralPath $PSCommandPath -Force
 `;
-  await fsp.writeFile(path.join(installPath, 'Uninstall.cmd'), cmd, 'utf8');
+  await fsp.writeFile(path.join(installPath, 'Uninstall.ps1'), ps, 'utf8');
+  // Nettoyage d'un éventuel ancien Uninstall.cmd (install <= 0.1.2) pour ne pas
+  // laisser traîner le désinstallateur cassé à côté du nouveau.
+  await fsp.rm(path.join(installPath, 'Uninstall.cmd'), { force: true }).catch(() => {});
 }
 
 function registerUninstall(installPath, exePath) {
   return new Promise((resolve, reject) => {
     // We use reg.exe directly — no extra deps, no permissions surprise.
     const key = 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\WatchVerse';
+    // Désinstallation via PowerShell caché (cf. writeUninstaller) — plus de
+    // fenêtre CMD, et le dossier d'install est réellement supprimé en entier.
+    const ps1 = path.join(installPath, 'Uninstall.ps1');
+    const uninstallCmd = `powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "${ps1}"`;
     const sets = [
       ['DisplayName', 'WatchVerse'],
       ['DisplayVersion', require('./package.json').version],
       ['Publisher', 'Team WatchVerse'],
       ['DisplayIcon', exePath],
       ['InstallLocation', installPath],
-      ['UninstallString', `cmd.exe /c "${path.join(installPath, 'Uninstall.cmd')}"`],
+      ['UninstallString', uninstallCmd],
+      ['QuietUninstallString', uninstallCmd],
       ['NoModify', '1', 'REG_DWORD'],
       ['NoRepair', '1', 'REG_DWORD'],
       ['EstimatedSize', String(48 * 1024), 'REG_DWORD'], // ~48 MB key (KB units)

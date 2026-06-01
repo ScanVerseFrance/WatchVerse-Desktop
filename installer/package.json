@@ -1,6 +1,6 @@
 {
   "name": "watchverse-installer",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Custom Electron installer for WatchVerse",
   "main": "main.js",
   "private": true,
