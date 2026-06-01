@@ -1,6 +1,6 @@
 {
   "name": "watchverse-webview",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Native desktop wrapper for WatchVerse with Discord Rich Presence",
   "main": "src/main.js",
   "private": true,

@@ -272,6 +272,17 @@ function emitPresenceFromUrl(urlStr) {
 function createWindow() {
   const icon = nativeImage.createFromPath(ICON_PATH);
 
+  // User-Agent Chrome « vanilla » : on retire les tokens "WatchVerse/x.y.z" et
+  // "Electron/y" de l'UA par défaut. Beaucoup de CDN de hosters throttlent ou
+  // renvoient une erreur aux UA non-navigateur → MOINS de sources VF+ passaient
+  // la validation client (drain du flux) DANS L'APP que sur le site (user
+  // 2026-06-02 : « moins de sources sur l'app que sur le site »). Avec un UA
+  // Chrome standard, les fetch CDN se comportent comme sur watchverse.watch.
+  const cleanUA = app.userAgentFallback
+    .replace(/ WatchVerse\/\S+/i, '')
+    .replace(/ Electron\/\S+/i, '');
+  app.userAgentFallback = cleanUA;
+
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -297,6 +308,11 @@ function createWindow() {
       backgroundThrottling: false,
     },
   });
+
+  // Force l'UA Chrome sur le webContents lui-même (couvre les fetch() du
+  // renderer, dont la validation des sources VF+) — pas seulement les requêtes
+  // de navigation.
+  mainWindow.webContents.setUserAgent(cleanUA);
 
   if (process.platform === 'win32') {
     mainWindow.setIcon(icon);
